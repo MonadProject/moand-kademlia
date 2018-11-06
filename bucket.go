@@ -66,5 +66,25 @@ func (bucket *Bucket) Split(cpl int, local DhtID) *Bucket {
 		}
 	}
 	return nextBucket
+}
 
+func (bucket *Bucket) Active(id PeerID) {
+	bucket.rwl.Lock()
+	defer bucket.rwl.Unlock()
+	element := bucket.search(id)
+	if element == nil {
+		return
+	}
+
+	bucket.list.MoveToFront(element)
+}
+
+//current only for method active usage
+func (bucket *Bucket) search(id PeerID) *list.Element {
+	for element := bucket.list.Front(); element != nil; element = element.Next() {
+		if element.Value.(PeerID) == id {
+			return element
+		}
+	}
+	return nil
 }
