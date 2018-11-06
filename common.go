@@ -17,7 +17,7 @@ type DhtID []byte
 //
 //因此，节点之间的距离越近，意味着节点ID的公共前缀越长。
 // 节点之间的距离以节点的最长公共前缀(cpl)为度量，cpl越大，表示两个节点越接近，
-// 例如节点 A=(000100), B=(000011)，Dis(A,B)=cpl(A,B)=3
+// 例如节点 A=(00000100), B=(00000011)，Dis(A,B)=cpl(A,B)=5
 func CPL(m, n []byte) int {
 	r := xor(m, n)
 	for index, byte := range r {
@@ -29,7 +29,8 @@ func CPL(m, n []byte) int {
 }
 
 func NewDhtID(id PeerID) DhtID {
-	return sha256.Sum256([]byte(id))[:]
+	dht := sha256.Sum256([]byte(id))
+	return dht[:]
 }
 
 func xor(m, n []byte) []byte {

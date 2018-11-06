@@ -95,3 +95,18 @@ func (bucket *Bucket) Exist(id PeerID) bool {
 	element := bucket.search(id)
 	return element != nil
 }
+
+func (bucket *Bucket) Length() int {
+	bucket.rwl.RLock()
+	defer bucket.rwl.Unlock()
+	return bucket.list.Len()
+}
+
+func (bucket *Bucket) Pop() {
+	bucket.rwl.Lock()
+	defer bucket.rwl.Unlock()
+	last := bucket.list.Back()
+	if last != nil {
+		bucket.list.Remove(last)
+	}
+}
