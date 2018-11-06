@@ -79,7 +79,7 @@ func (bucket *Bucket) Active(id PeerID) {
 	bucket.list.MoveToFront(element)
 }
 
-//current only for method active usage
+//current only for method active and exist usage
 func (bucket *Bucket) search(id PeerID) *list.Element {
 	for element := bucket.list.Front(); element != nil; element = element.Next() {
 		if element.Value.(PeerID) == id {
@@ -87,4 +87,11 @@ func (bucket *Bucket) search(id PeerID) *list.Element {
 		}
 	}
 	return nil
+}
+
+func (bucket *Bucket) Exist(id PeerID) bool {
+	bucket.rwl.Lock()
+	defer bucket.rwl.Unlock()
+	element := bucket.search(id)
+	return element != nil
 }
