@@ -16,6 +16,10 @@ func NewBucket() *Bucket {
 	return bucket
 }
 
+func (bucket *Bucket) Empty() bool {
+	return bucket.list.Len() == 0
+}
+
 //push front
 func (bucket *Bucket) Push(id PeerID) {
 	bucket.rwl.Lock()
