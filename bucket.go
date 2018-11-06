@@ -43,3 +43,28 @@ func (bucket *Bucket) AllPeers() []PeerID {
 	}
 	return result
 }
+
+// 迁移的原则是：将与本地节点更近(即​更大)节点迁移至新建 Bucket ​，
+// 迁移完成后再判断新建 Bucket ​内节点数是否超过​限制，如果是，继续对该新建 Bucket ​进行分裂。
+func (bucket *Bucket) Split(cpl int, local DhtID) *Bucket {
+	bucket.rwl.Lock()
+	defer bucket.rwl.Unlock()
+
+	nextBucket := NewBucket()
+	element := bucket.list.Front()
+
+	for element != nil {
+		id := NewDhtID(element.Value.(PeerID))
+		ds := CPL(local, id)
+		if ds > cpl {
+			current := element
+			nextBucket.list.PushFront(element.Value)
+			element = element.Next()
+			bucket.list.Remove(current)
+		} else {
+			element = element.Next()
+		}
+	}
+	return nextBucket
+
+}
