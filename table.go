@@ -44,9 +44,6 @@ func (table *Table) Find(id PeerID) PeerSortedList {
 			cpl:  CPL(table.self, NewDhtID(element.Value.(PeerID))),
 		}
 
-		if len(list) == PeerCount {
-			break
-		}
 		list = append(list, peerWrapper)
 	}
 
@@ -56,7 +53,7 @@ func (table *Table) Find(id PeerID) PeerSortedList {
 
 	sort.Sort(list)
 
-	return list
+	return list[0:PeerCount]
 }
 
 func (table *Table) Add(peer PeerID) {
