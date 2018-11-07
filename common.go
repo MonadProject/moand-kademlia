@@ -40,3 +40,23 @@ func xor(m, n []byte) []byte {
 	}
 	return r
 }
+
+//排序相关
+type PeerCPLWrapper struct {
+	peer PeerID
+	cpl  int
+}
+
+type PeerSorter []*PeerCPLWrapper
+
+func (sorter PeerSorter) Len() int {
+	return len(sorter)
+}
+
+func (sorter PeerSorter) Less(i, j int) bool {
+	return sorter[i].cpl < sorter[j].cpl
+}
+
+func (sorter PeerSorter) Swap(i, j int) {
+	sorter[i], sorter[j] = sorter[j], sorter[i]
+}
