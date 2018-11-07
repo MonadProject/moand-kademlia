@@ -47,16 +47,17 @@ type PeerCPLWrapper struct {
 	cpl  int
 }
 
-type PeerSorter []*PeerCPLWrapper
+type PeerSortedList []*PeerCPLWrapper
 
-func (sorter PeerSorter) Len() int {
+func (sorter PeerSortedList) Len() int {
 	return len(sorter)
 }
 
-func (sorter PeerSorter) Less(i, j int) bool {
-	return sorter[i].cpl < sorter[j].cpl
+//cpl 越大，距离越近
+func (sorter PeerSortedList) Less(i, j int) bool {
+	return sorter[i].cpl > sorter[j].cpl
 }
 
-func (sorter PeerSorter) Swap(i, j int) {
+func (sorter PeerSortedList) Swap(i, j int) {
 	sorter[i], sorter[j] = sorter[j], sorter[i]
 }

@@ -1,6 +1,12 @@
 package monad_kademlia
 
-import "sync"
+import (
+	"sort"
+	"sync"
+)
+
+//每次查询最近节点时，返回的结果数
+const PeerCount = 10
 
 //构建路由表的本质是建立到网络全局的地图，目标是：对于节点​ M ，给定任意节点 X ​，可以根据节点​很容易计算出​距离 X 更近的节点列表
 // 虽然我们的目标是本地一步到位的查找，但这是不现实的，这需要维护数量巨大的全局节点信息
@@ -21,6 +27,36 @@ func NewTable(self DhtID, size int) *Table {
 		Buckets:    []*Bucket{NewBucket()},
 		bucketsize: size,
 	}
+}
+
+func (table *Table) Find(id PeerID) PeerSortedList {
+	table.rwl.RLock()
+	cpl := CPL(table.self, NewDhtID(id))
+	if cpl >= len(table.Buckets) {
+		cpl = len(table.Buckets) - 1
+	}
+	bucket := table.Buckets[cpl]
+
+	list := make(PeerSortedList, 0, PeerCount)
+	for element := bucket.list.Front(); element != nil; element = element.Next() {
+		peerWrapper := &PeerCPLWrapper{
+			peer: element.Value.(PeerID),
+			cpl:  CPL(table.self, NewDhtID(element.Value.(PeerID))),
+		}
+
+		if len(list) == PeerCount {
+			break
+		}
+		list = append(list, peerWrapper)
+	}
+
+	//todo if the length is not enough
+
+	table.rwl.Unlock()
+
+	sort.Sort(list)
+
+	return list
 }
 
 func (table *Table) Add(peer PeerID) {
@@ -67,5 +103,4 @@ func (table *Table) split() {
 	if nextBucket.Length() > table.bucketsize {
 		table.split()
 	}
-
 }
