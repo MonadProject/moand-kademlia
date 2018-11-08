@@ -28,7 +28,6 @@ func NewTable(self DhtID, size int) *Table {
 		bucketsize: size,
 	}
 }
-
 func (table *Table) Find(id PeerID) PeerSortedList {
 	table.rwl.RLock()
 	cpl := CPL(table.self, NewDhtID(id))
@@ -54,6 +53,10 @@ func (table *Table) Find(id PeerID) PeerSortedList {
 	sort.Sort(list)
 
 	return list[0:PeerCount]
+}
+
+func (table *Table) FindBest(target PeerID) PeerID {
+	return table.Find(target)[0].peer
 }
 
 func (table *Table) Add(peer PeerID) {
